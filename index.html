@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Work+Sans:wght@900&display=swap');
+html, body {
+  font-family: 'Work Sans', Helvetica, Arial, sans-serif;
+}
+button {
+  font-weight: bold;
+}
+#c {
+  background-color: grey;
+  margin-top: 10px;
+}
+
+button {
+  padding: 10px 20px;
+}
+
+.container {
+  max-width: 400px;
+  margin: 0 auto;
+  text-align: center;
+}
+body {
+  width: 100%;
+}
+.typemark {
+  text-transform: uppercase;
+}
+    </style>
+  </head>
+  <body>
+    <div class="container">
+
+  <nav>
+  <h1 class="typemark">Top Cookie</h1>
+</nav>
+<!-- <button id="cookie">Cookie</button> -->
+<!-- <button id="sepia">Sepia</button> -->
+<!-- <button id="rect">Rect</button> -->
+<button id="circ">Chocolate Chip</button>
+<!-- <button id="save">Save</button> -->
+<button id="dl">Bake</button>
+<!-- <input type="text" id="text" /> -->
+<br> 
+<canvas id="c" width="400" height="400"></canvas>
+<br>  
+<p class="save">
+</p>
+  
+  </div>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/1.1.0/fabric.all.min.js"></script>
+    <script type="text/javascript">
+      var canvas = new fabric.Canvas('c', {backgroundColor : "#fff"});
+var f = fabric.Image.filters;
+
+var cookie = resetCookie();
+function resetCookie() {
+  while (canvas.getObjects().length > 0) {
+    var objects = canvas.getObjects();
+    for(var i = 0; i < objects.length; i++){
+      //console.log(objects[i]);     
+      canvas.remove(objects[i]);
+    }
+  }
+  
+  
+  var cookie = new fabric.Circle({
+    left: 200,
+    top: 200,
+    radius: (400 - 2*10) / 2,     
+    fill: '#ffdd66',// 'brown',
+    stroke: '#ddc044',
+    strokeWidth: 5,
+    // editable: false
+			  });  
+  canvas.add(cookie);
+  canvas.renderAll();
+  return cookie;
+}
+function applyFilter(index, filter) {
+    var obj = canvas.getActiveObject();
+    obj.filters[index] = filter;
+    var timeStart = +new Date();
+    obj.applyFilters();
+    var timeEnd = +new Date();
+    var dimString = canvas.getActiveObject().width + ' x ' +
+      canvas.getActiveObject().height;
+    // $('bench').innerHTML = dimString + 'px ' +
+    //   parseFloat(timeEnd-timeStart) + 'ms';
+    canvas.renderAll();
+}
+
+
+$("#sepia").on("click", function(e) {
+    applyFilter(3, new f.Sepia());
+});
+
+// canvas.setBackgroundImage('http://lorempixel.com/400/400/fashion', canvas.renderAll.bind(canvas));
+$("#text").on("click", function(e) {
+text = new fabric.Text($("#text").val(), { left: 100, top: 100 });
+	  canvas.add(text);
+});
+
+// $('#cookie').on('click', function(e) {
+//   var cookie = new fabric.Circle({
+//     left: 200,
+//     top: 200,
+//     radius: (400 - 2*10) / 2,     
+//     fill: '#ddbb22',// 'brown',
+//     stroke: 'darkbrown',
+//     strokeWidth: 5,
+//     // editable: false
+// 			  });  
+//   var cookie2 = new fabric.Circle({
+//     left: 300,
+//     top: 200,
+//     radius: (400 - 2*10) / 2,     
+//     fill: '#ddbb22',// 'brown',
+//     stroke: 'darkbrown',
+//     strokeWidth: 5,
+//     // editable: false
+// 			  });  
+//   var group = new fabric.Group([ cookie, cookie2 ], {
+//   left: 150,
+//   top: 100,
+//   angle: -10
+// });
+//   // cookie.add(cookie2);
+//   canvas.add(group);
+//   // canvas.item(0).hasControls = false;
+// })
+$("#rect").on("click", function(e) {
+  	rect = new fabric.Rect({
+    left: 40,
+    top: 40,
+    width: 50,
+    height: 50,      
+    fill: 'transparent',
+    stroke: 'green',
+    strokeWidth: 5,
+			  });  
+  canvas.add(rect);
+});
+
+$("#circ").on("click", function(e) {
+    var chip =  new fabric.Circle({
+    left: 60 + Math.random() * 280,
+    top: 60 + Math.random() * 280,
+    radius: 20 + Math.random() * 5,     
+    fill: '#aa7722',
+    // stroke: 'brown',
+    strokeWidth: 5,
+			  });
+  	// rect = new fabric.Circle({
+  	// left: 40,
+  	// top: 40,
+  	// radius: 50,     
+  	// fill: 'transparent',
+  	// stroke: 'green',
+  	// strokeWidth: 5,
+  	// });  
+  canvas.add(chip);
+});
+
+$("#save").on("click", function(e) {
+  //   var canv = document.getElementById('c');
+  // var img = canv.toDataURL('image/png');
+  //   var img = canvas.toDataURL({
+  //     format: "png",
+  //     multiplier: 1
+  //   });
+  // console.log(img);
+    //$(".save").html('<img src="'+img+'"/>');
+  	//$(".save").html(canvas.toSVG());
+  	$(".save").html(canvas.toSVG());
+});
+
+$('#dl').on('click', function(e) {
+  //var url = "data:image/svg+xml;charset=utf-8,"+ canvas.toSVG();
+  var rawColor = cookie.get('fill');
+  // cookie.backgroundColor = '#ddcc55';
+  cookie.set('fill', '#f2cd66');
+  var svgData = canvas.toSVG();
+  cookie.set('fill', rawColor);
+  cookie = resetCookie();
+  var svgBlob = new Blob([svgData], {type:"image/svg+xml;charset=utf-8"});
+  var svgUrl = URL.createObjectURL(svgBlob);
+  var downloadLink = document.createElement("a");
+  downloadLink.href = svgUrl;
+  downloadLink.download = "cookie.svg";
+  document.body.appendChild(downloadLink);
+  downloadLink.click();
+  document.body.removeChild(downloadLink);
+})
+    </script>
+  </body>
+</html>
